@@ -74,6 +74,27 @@ This kit follows the [Agent Skills](https://agentskills.io/) format. Every skill
 
 ### Claude Code
 
+#### Recommended: install as a Claude plugin
+
+This repo ships a [Claude Code plugin](https://docs.claude.com/en/docs/claude-code/plugins) under [`.claude-plugin/`](.claude-plugin/) that bundles the [DocumentDB MCP server](https://www.npmjs.com/package/documentdb-mcp-server) together with all the skills in this kit.
+
+Inside Claude Code:
+
+```text
+/plugin marketplace add Azure/documentdb-agent-kit
+/plugin install documentdb@azure-documentdb
+```
+
+The plugin runs the MCP server over `stdio` via `npx documentdb-mcp-server` (Node.js 20+ required). Configure backend access by setting `DOCUMENTDB_CONNECTION_PROFILES` in your shell, for example:
+
+```bash
+export DOCUMENTDB_CONNECTION_PROFILES='{"sandbox":{"authMode":"entra","endpoint":"<cluster>.mongocluster.cosmos.azure.com","tokenScope":"https://ossrdbms-aad.database.windows.net/.default","allowedHosts":["*.mongocluster.cosmos.azure.com"]}}'
+```
+
+Read tools are enabled by default; flip `ENABLE_WRITE_TOOLS` / `ENABLE_MANAGEMENT_TOOLS` in [`mcp.json`](mcp.json) to opt in to higher-impact tools.
+
+#### Manual: skills only (no MCP server)
+
 Project-scoped (only this repo sees the skills):
 
 ```bash
