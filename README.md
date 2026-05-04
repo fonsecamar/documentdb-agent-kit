@@ -110,17 +110,48 @@ for d in skills/*/; do ln -s "$(pwd)/$d" ~/.claude/skills/; done
 
 On Windows/PowerShell, use `New-Item -ItemType SymbolicLink` or just copy the folder.
 
+### Cursor
+
+Inside a Cursor session:
+
+```text
+/add-plugin azure/documentdb-agent-kit
+```
+
+Cursor reads [`.cursor-plugin/plugin.json`](.cursor-plugin/plugin.json), which points at the same [`mcp.json`](mcp.json) and `skills/` tree as the Claude plugin. Set `DOCUMENTDB_CONNECTION_PROFILES` in your environment before launching Cursor.
+
+### Codex
+
+From a Codex session:
+
+```bash
+codex plugin marketplace add azure/documentdb-agent-kit
+codex plugin install documentdb
+```
+
+Codex discovers the plugin through [`.agents/plugins/marketplace.json`](.agents/plugins/marketplace.json) and loads [`.codex-plugin/plugin.json`](.codex-plugin/plugin.json).
+
+### Gemini CLI
+
+Install the extension directly from this repo:
+
+```bash
+gemini extensions install https://github.com/Azure/documentdb-agent-kit
+```
+
+This uses [`gemini-extension.json`](gemini-extension.json) and [`GEMINI.md`](GEMINI.md) at the repo root. Configure backend access with `DOCUMENTDB_CONNECTION_PROFILES` (see [`GEMINI.md`](GEMINI.md) for examples).
+
 ### GitHub Copilot (CLI and IDE)
 
 `AGENTS.md` at the repo root is the entry point — Copilot reads it automatically when you open the repo. No extra wiring required. If you want Copilot to see the kit in a *different* repo, copy `AGENTS.md` and the `skills/` folder into that repo's root.
 
-### Gemini CLI
-
-Gemini CLI reads `GEMINI.md`:
+To also pull in the MCP server in Copilot CLI:
 
 ```bash
-ln -s AGENTS.md GEMINI.md      # or: cp AGENTS.md GEMINI.md
+/plugin install https://github.com/Azure/documentdb-agent-kit.git
 ```
+
+Then restart Copilot CLI to activate the MCP server.
 
 ### Other Agent Skills–compatible tools
 
@@ -138,7 +169,7 @@ Run it after adding new skills or editing front matter.
 
 ## Compatibility
 
-Works with Claude Code, GitHub Copilot, Gemini CLI, and other Agent Skills-compatible tools.
+Works with Claude Code, Cursor, Codex, Gemini CLI, GitHub Copilot, and other Agent Skills-compatible tools.
 
 ## License
 
