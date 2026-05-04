@@ -46,6 +46,16 @@ gemini extensions install https://github.com/Azure/documentdb-agent-kit
 
 Then restart Copilot CLI to activate the MCP server. For Copilot in the IDE, [`AGENTS.md`](AGENTS.md) at the repo root is read automatically — no extra wiring.
 
+### Universal one-liner — skills only (no MCP server)
+
+To install just the skill catalog into whichever agent you're using, via the [skills.sh](https://skills.sh/) CLI:
+
+```bash
+npx skills add Azure/documentdb-agent-kit
+```
+
+This drops the rule docs into your agent's skill directory but **does not** install the MCP server. Use one of the per-agent plugin commands above if you want the DB tools too.
+
 ## Configuration
 
 The MCP server is administrator-controlled: tools never accept runtime connection strings. Set `DOCUMENTDB_CONNECTION_PROFILES` in your shell before launching the agent.
