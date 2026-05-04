@@ -4,7 +4,7 @@ A bundle of agent skills + an MCP server for **Azure DocumentDB (MongoDB-compati
 
 Skills follow the [Agent Skills](https://agentskills.io/) format and the kit ships with plugin manifests for Claude Code, Cursor, Codex, Gemini CLI, and GitHub Copilot.
 
-👉 **Capabilities and skill catalog:** [`SKILLS.md`](SKILLS.md)
+👉 **Capabilities and skill catalog:** [`docs/SKILLS.md`](docs/SKILLS.md)
 
 ## Installation
 
