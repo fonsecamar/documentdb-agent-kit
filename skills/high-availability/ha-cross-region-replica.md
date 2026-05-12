@@ -8,7 +8,7 @@ Azure DocumentDB supports **active-passive cross-region replication**: one clust
 - Disaster recovery across regions.
 - Read-scale offload to the replica for heavy analytical reads or for region-local reads close to distant users.
 
-Two things to internalize before designing for cross-region:
+Three things to internalize before designing for cross-region:
 
 - **Replication is asynchronous.** Replica reads are eventually consistent — writes acknowledged on the primary may not yet be visible on the replica. Applications that need read-your-own-writes must route those reads to the primary.
 - **Regional promotion has a non-zero RPO.** Because replication is asynchronous, recent writes that haven't yet been delivered to the replica are **lost** when the replica is promoted during a regional outage. Replication lag depends on the primary's write intensity and overall cluster load — monitor lag and size both clusters to keep it bounded.
@@ -158,13 +158,13 @@ If the replica is in a separate Terraform state, hard-code `source_server_id` an
 Promotion is a control-plane action (REST / portal); there is no IaC primitive for it. After promotion, the former replica becomes a standalone read-write cluster. The full operational checklist:
 
 1. **Trigger promotion** from the Azure portal: select the replica → **Settings → Global distribution → Promote**, confirm the cluster name. (Equivalent REST call available via `az rest`.) During promotion, the **Global read-write** connection string is automatically updated to point at the newly promoted cluster, and **the ex-primary is automatically reconfigured as the new replica (read-only)** of the promoted cluster. This means you can "fail back" later by promoting the original cluster again — no need to recreate the replication relationship.
-2. **Re-enable HA on the promoted cluster.** HA is **not** carried over automatically — once the former replica becomes the new primary, set `highAvailability.targetMode` to `ZoneRedundantPreferred` so the promoted cluster regains the 99.99 % in-region SLA.
+2. **Re-enable HA on the promoted cluster.** HA is **not** carried over automatically — once the former replica becomes the new primary, set `highAvailability.targetMode` to `ZoneRedundantPreferred` so the promoted cluster regains the 99.99% in-region SLA.
 3. **Update application connection strings.** Behavior depends on which string the app uses:
    - **Global read-write** (`<cluster>.global.mongocluster.cosmos.azure.com` on the original primary) — keeps working; it auto-routes to the new write region after promotion. **Use this in apps to avoid post-promotion code changes.**
    - **Self / cluster-specific** of the old primary — becomes read-only. Apps that wrote through it must be repointed to the new primary's self connection string (or to the Global RW string).
    - **Self of the former replica** — still valid; the cluster is now the new primary.
 4. **Update IaC** to drop `createMode` / `create_mode` and `replicaParameters` for the promoted cluster so subsequent runs don't try to re-link it.
-5. **Re-establish a new replica** (in the original primary's region or a new DR region) once the situation stabilizes, so you retain the 99.995 % combined SLA.
+5. **Restore DR coverage.** Step 1 already reconfigures the ex-primary as the new replica when its region is healthy, so you may already have a cross-region pair again — verify in the portal. **A new replica only needs to be established if** the ex-primary's region is permanently unavailable, the ex-primary cluster cannot be recovered, or you want DR coverage in a *different* region than before. In any of those cases, create a new replica (in the original region once it recovers, or in a new DR region) to retain the 99.995% combined SLA.
 6. **Reconfigure networking on the promoted cluster** if needed — firewall rules and Private Endpoints are independent per cluster, so the new primary should already have its own; verify the rule set matches what the app expects from a primary.
 
 See [Replica cluster promotion](https://learn.microsoft.com/azure/documentdb/cross-region-replication#replica-cluster-promotion) and [Manage cluster replication — Promote a replica](https://learn.microsoft.com/azure/documentdb/how-to-cluster-replica#promote-a-replica).
