@@ -51,8 +51,8 @@ Result: Backups permanently purged. Data is unrecoverable.
 
 ```text
 Production-critical Azure DocumentDB topology:
-  • HA enabled                        → 99.99 %  SLA, zone redundancy
-  • Cross-region replica              → 99.995 % SLA, regional DR
+  • HA enabled                        → 99.99% SLA, zone redundancy
+  • Cross-region replica              → 99.995% SLA, regional DR
   • Automatic backups (35-day active) → recover from logical errors
   • Tested restore + promotion runbook
 ```
