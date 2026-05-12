@@ -57,18 +57,30 @@ resource restored 'Microsoft.DocumentDB/mongoClusters@2025-09-01' = {
 ```bash
 # Step 1: create / restore the cluster — wait for it to be Ready.
 az deployment group create --template-file cluster.bicep ...
-az mongo-cluster show --query "properties.provisioningState" -o tsv   # → Succeeded
+az resource show \
+  --resource-group "<rg>" --name "<cluster>" \
+  --resource-type Microsoft.DocumentDB/mongoClusters \
+  --query "properties.provisioningState" -o tsv   # → Succeeded
 
 # Step 2: give the disk time to finish hydrating (workload-dependent;
 #         a few minutes for small clusters, longer for multi-TB).
 #         Optional sanity check: run a small workload and watch latency settle.
 
 # Step 3: enable HA on its own.
-az resource update --set properties.highAvailability.targetMode="ZoneRedundantPreferred" ...
-az mongo-cluster show --query "properties.provisioningState" -o tsv   # → Succeeded
+az resource update \
+  --resource-group "<rg>" --name "<cluster>" \
+  --resource-type Microsoft.DocumentDB/mongoClusters \
+  --set properties.highAvailability.targetMode="ZoneRedundantPreferred"
+az resource show \
+  --resource-group "<rg>" --name "<cluster>" \
+  --resource-type Microsoft.DocumentDB/mongoClusters \
+  --query "properties.provisioningState" -o tsv   # → Succeeded
 
 # Step 4: only now scale compute or storage if needed.
-az resource update --set properties.compute.tier="M60" ...
+az resource update \
+  --resource-group "<rg>" --name "<cluster>" \
+  --resource-type Microsoft.DocumentDB/mongoClusters \
+  --set properties.compute.tier="M60"
 ```
 
 ### Multi-step IaC: prefer sequential deployments
