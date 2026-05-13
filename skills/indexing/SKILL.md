@@ -10,6 +10,8 @@ Companion skill to `documentdb-query-optimizer`. That skill answers *"why is thi
 
 Azure DocumentDB supports the standard MongoDB index types. Only `_id` is created automatically — every other index must be created explicitly. Default limit: **64 single-field indexes per collection** (extendable to 300 on request).
 
+The `_id` index is a **B-tree**, created automatically, and cannot be dropped. For sharded collections the `_id` key is composite — it includes a hash of the shard key. All other indexes created via `createIndex` are **RUM** indexes; the exception is geospatial indexes (`2dsphere`, `2d`), which are **GiST** indexes.
+
 ## Rules
 
 - [index-single-field](index-single-field.md) — When a single-field index is enough; direction, options (`unique`, `sparse`, `partial`, collation).
